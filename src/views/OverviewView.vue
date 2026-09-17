@@ -128,6 +128,12 @@ export default {
     }
   },
   computed: {
+    scoreClass() {
+      if (!this.report) return ''
+      if (this.report.qualityScore >= 90) return 'success'
+      if (this.report.qualityScore >= 70) return 'warning'
+      return 'danger'
+    },
     hasNumericStats() {
       return this.report && this.report.columns && this.report.columns.some(c => c.statistics)
     },
