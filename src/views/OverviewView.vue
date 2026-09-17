@@ -70,7 +70,7 @@
       <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">
         <input
           type="text"
-          v-model="searchQuery"
+          v-model="searchInput"
           placeholder="搜索数据..."
           style="flex:1;padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;"
         />
@@ -113,6 +113,8 @@
 </template>
 
 <script>
+import { debounce } from '../utils/index.js'
+
 export default {
   props: {
     dataset: { type: Object, default: null },
@@ -122,9 +124,21 @@ export default {
     return {
       currentPage: 0,
       pageSize: 50,
+      searchInput: '',
       searchQuery: '',
       sortBy: '',
       sortAsc: true
+    }
+  },
+  created() {
+    this.debouncedSearch = debounce((val) => {
+      this.searchQuery = val
+    }, 300)
+  },
+  watch: {
+    searchInput(val) {
+      this.currentPage = 0
+      this.debouncedSearch(val)
     }
   },
   computed: {
@@ -173,11 +187,6 @@ export default {
     paginatedRows() {
       const start = this.currentPage * this.pageSize
       return this.previewRows.slice(start, start + this.pageSize)
-    }
-  },
-  watch: {
-    searchQuery() {
-      this.currentPage = 0
     }
   },
   methods: {

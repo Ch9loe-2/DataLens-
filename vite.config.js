@@ -8,7 +8,16 @@ export default defineConfig({
     open: true
   },
   build: {
-    target: 'esnext'
+    target: 'esnext',
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          echarts: ['echarts'],
+          vendor: ['vue']
+        }
+      }
+    }
   },
   worker: {
     format: 'es'

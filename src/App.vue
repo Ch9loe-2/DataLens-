@@ -101,12 +101,12 @@
 </template>
 
 <script>
-import ImportView from './views/ImportView.vue'
-import OverviewView from './views/OverviewView.vue'
-import QualityView from './views/QualityView.vue'
-import CleaningView from './views/CleaningView.vue'
-import ChartsView from './views/ChartsView.vue'
-import ExportView from './views/ExportView.vue'
+const ImportView = () => import('./views/ImportView.vue')
+const OverviewView = () => import('./views/OverviewView.vue')
+const QualityView = () => import('./views/QualityView.vue')
+const CleaningView = () => import('./views/CleaningView.vue')
+const ChartsView = () => import('./views/ChartsView.vue')
+const ExportView = () => import('./views/ExportView.vue')
 import Dataset from './models/Dataset.js'
 import { runAnalysis } from './analysis/index.js'
 
