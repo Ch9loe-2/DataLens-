@@ -40,7 +40,7 @@
           <div class="stat-label">数据质量评分</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value success">{{ report.totalMissing }}</div>
+          <div class="stat-value" :class="missingClass">{{ report.totalMissing }}</div>
           <div class="stat-label">剩余缺失值</div>
         </div>
         <div class="stat-card">
@@ -65,6 +65,10 @@ export default {
       if (this.report.qualityScore >= 90) return 'success'
       if (this.report.qualityScore >= 70) return 'warning'
       return 'danger'
+    },
+    missingClass() {
+      if (this.report.totalMissing === 0) return 'success'
+      return 'warning'
     }
   },
   methods: {

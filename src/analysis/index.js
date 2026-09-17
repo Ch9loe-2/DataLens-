@@ -1,7 +1,3 @@
-/**
- * Analysis engine - runs analysis on main thread or dispatches to Web Worker
- */
-
 let worker = null
 
 function getWorker() {

@@ -1,6 +1,3 @@
-/**
- * Column model - represents a single column in a dataset
- */
 export default class Column {
   constructor(name, index) {
     this.name = name
@@ -13,9 +10,6 @@ export default class Column {
     this.statistics = {}
   }
 
-  /**
-   * Infer the column type from sample values
-   */
   inferType(values) {
     if (!values || values.length === 0) return 'string'
 
@@ -44,9 +38,6 @@ export default class Column {
     return 'string'
   }
 
-  /**
-   * Compute basic statistics for numeric column
-   */
   computeNumericStats(values) {
     const nums = values
       .filter(v => v !== null && v !== undefined && v !== '' && !isNaN(parseFloat(v)))

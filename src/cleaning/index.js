@@ -1,7 +1,3 @@
-/**
- * Cleaning engine - transforms dataset rows
- */
-
 export function removeDuplicates(rows) {
   const seen = new Set()
   const result = []
@@ -114,9 +110,6 @@ export function convertType(rows, column, targetType) {
   return { rows: result, converted, failed }
 }
 
-/**
- * Delete a column from all rows
- */
 export function deleteColumn(rows, columnName) {
   let removed = 0
   const result = rows.map(row => {
@@ -127,9 +120,6 @@ export function deleteColumn(rows, columnName) {
   return { rows: result, removed: rows.length }
 }
 
-/**
- * Rename a column
- */
 export function renameColumn(rows, oldName, newName) {
   const result = rows.map(row => {
     const newRow = { ...row }
@@ -140,10 +130,6 @@ export function renameColumn(rows, oldName, newName) {
   return { rows: result }
 }
 
-/**
- * Advanced filter — apply conditions to rows
- * conditions: [{ column, operator: 'equals'|'contains'|'gt'|'lt'|'gte'|'lte'|'notEmpty'|'empty', value }]
- */
 export function applyFilter(rows, conditions, matchAll = true) {
   if (!conditions || conditions.length === 0) return { rows: [...rows], matched: rows.length }
 
@@ -152,15 +138,18 @@ export function applyFilter(rows, conditions, matchAll = true) {
       const cell = row[cond.column]
       const val = cond.value
 
+      const cellStr = cell === null || cell === undefined ? '' : String(cell)
+      const valStr = val === null || val === undefined ? '' : String(val)
+
       switch (cond.operator) {
         case 'equals':
-          return String(cell || '') === String(val || '')
+          return cellStr === valStr
         case 'notEquals':
-          return String(cell || '') !== String(val || '')
+          return cellStr !== valStr
         case 'contains':
-          return String(cell || '').toLowerCase().includes(String(val || '').toLowerCase())
+          return cellStr.toLowerCase().includes(valStr.toLowerCase())
         case 'notContains':
-          return !String(cell || '').toLowerCase().includes(String(val || '').toLowerCase())
+          return !cellStr.toLowerCase().includes(valStr.toLowerCase())
         case 'gt':
           return parseFloat(cell) > parseFloat(val)
         case 'lt':

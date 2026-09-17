@@ -1,6 +1,3 @@
-/**
- * Dataset model - holds the parsed data, columns, analysis results and history
- */
 import Column from './Column.js'
 
 export default class Dataset {
@@ -68,8 +65,6 @@ export default class Dataset {
 
   /**
    * Undo last operation.
-   * history[i] stores the state BEFORE the i-th operation was applied.
-   * Undoing restores history[historyIndex] (the state before the last operation).
    */
   undo() {
     if (this.historyIndex < 0) return false

@@ -1,28 +1,6 @@
 /**
- * Charts - ECharts wrapper for data visualization
+ * Charts - ECharts chart configuration builders
  */
-import * as echarts from 'echarts'
-
-let chartInstance = null
-
-export function renderChart(dom, options) {
-  if (!dom) return null
-  if (!chartInstance) {
-    chartInstance = echarts.init(dom)
-  } else {
-    chartInstance.dispose()
-    chartInstance = echarts.init(dom)
-  }
-  chartInstance.setOption(options)
-  return chartInstance
-}
-
-export function disposeChart() {
-  if (chartInstance) {
-    chartInstance.dispose()
-    chartInstance = null
-  }
-}
 
 export function buildLineChart(xData, yData, xLabel, yLabel, title) {
   return {

@@ -41,7 +41,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="col in report.columns" :key="col.name">
+            <tr v-for="col in missingCols" :key="col.name">
               <td>{{ col.name }}</td>
               <td>
                 <span v-if="col.nullCount > 0" style="color:var(--danger);">{{ col.nullCount }}</span>

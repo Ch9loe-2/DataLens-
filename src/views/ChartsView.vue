@@ -35,6 +35,9 @@
       <div v-if="recommendation" style="margin-top:8px;font-size:12px;color:var(--text-secondary);">
         推荐: <strong>{{ recommendation }}</strong>
       </div>
+      <div v-if="resolvedType && chartType === 'auto'" style="margin-top:4px;font-size:12px;color:var(--text-muted);">
+        实际使用: <strong>{{ resolvedType }}</strong>
+      </div>
     </div>
 
     <div class="card">
@@ -83,8 +86,10 @@ export default {
       chartType: 'auto',
       histogramCol: '',
       chartBuilt: false,
+      resolvedType: '',
       chartInstance: null,
-      histInstance: null
+      histInstance: null,
+      _generation: 0
     }
   },
   computed: {
@@ -109,7 +114,8 @@ export default {
     async buildChart() {
       if (!this.xCol || !this.yCol || !this.dataset) return
 
-      const rows = this.dataset.getRows().slice(0, 5000) // Limit for performance
+      const gen = ++this._generation
+      const rows = this.dataset.getRows().slice(0, 5000)
       const xColInfo = this.report.columns.find(c => c.name === this.xCol)
       const yColInfo = this.report.columns.find(c => c.name === this.yCol)
 
@@ -117,11 +123,11 @@ export default {
       if (resolvedType === 'auto') {
         resolvedType = getChartTypeRecommendation(xColInfo, yColInfo)
       }
+      this.resolvedType = resolvedType
 
       let option
 
       if (resolvedType === 'pie') {
-        // Pie chart: x col as category, y col as value
         const agg = {}
         for (const row of rows) {
           const key = row[this.xCol] || '(empty)'
@@ -133,17 +139,14 @@ export default {
         const data = Object.entries(agg).slice(0, 20).map(([name, value]) => ({ name, value }))
         option = buildPieChart(data, `${this.xCol} - ${this.yCol}`)
       } else if (resolvedType === 'line') {
-        // For date-based x axis, aggregate by date
         const xData = rows.map(r => r[this.xCol])
         const yData = rows.map(r => parseFloat(r[this.yCol]) || 0)
         option = buildLineChart(xData, yData, this.xCol, this.yCol)
       } else if (resolvedType === 'scatter') {
-        // Use bar chart as fallback for scatter
         const xData = rows.map(r => r[this.xCol])
         const yData = rows.map(r => parseFloat(r[this.yCol]) || 0)
         option = buildBarChart(xData, yData, this.xCol, this.yCol, `${this.yCol} by ${this.xCol}`)
       } else {
-        // Bar chart: aggregate by category
         if (xColInfo && xColInfo.type === 'number') {
           const xData = rows.map(r => r[this.xCol])
           const yData = rows.map(r => parseFloat(r[this.yCol]) || 0)
@@ -162,7 +165,11 @@ export default {
         }
       }
 
+      // Guard against stale async call
+      if (gen !== this._generation) return
+
       this.$nextTick(() => {
+        if (gen !== this._generation) return
         if (this.chartInstance) {
           this.chartInstance.dispose()
         }
@@ -175,21 +182,25 @@ export default {
     },
 
     async buildHistogram() {
-      if (!this.histogramCol) return
-      const rows = this.dataset.getRows().slice(0, 10000)
-      const values = rows.map(r => parseFloat(r[this.histogramCol])).filter(v => !isNaN(v))
-      const option = buildHistogram(values, `${this.histogramCol} 分布`)
+if (!this.histogramCol) return
+			const gen = ++this._generation
+			const rows = this.dataset.getRows().slice(0, 10000)
+			const values = rows.map(r => parseFloat(r[this.histogramCol])).filter(v => !isNaN(v))
+			const option = buildHistogram(values, `${this.histogramCol} 分布`)
 
-      this.$nextTick(() => {
-        if (this.histInstance) {
-          this.histInstance.dispose()
-        }
-        if (this.$refs.histogramRef) {
-          this.histInstance = echarts.init(this.$refs.histogramRef)
-          this.histInstance.setOption(option)
-        }
-      })
-    }
+			if (gen !== this._generation) return
+
+			this.$nextTick(() => {
+				if (gen !== this._generation) return
+				if (this.histInstance) {
+					this.histInstance.dispose()
+				}
+				if (this.$refs.histogramRef) {
+					this.histInstance = echarts.init(this.$refs.histogramRef)
+					this.histInstance.setOption(option)
+				}
+			})
+		}
   },
   beforeUnmount() {
     if (this.chartInstance) this.chartInstance.dispose()

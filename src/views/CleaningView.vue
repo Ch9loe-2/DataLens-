@@ -272,6 +272,7 @@ export default {
 
     undo() {
       if (this.dataset.undo()) {
+        this.preview = null
         this.$emit('dataset-updated')
       }
     },

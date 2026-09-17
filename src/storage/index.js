@@ -1,7 +1,3 @@
-/**
- * Storage - IndexedDB persistence for datasets
- */
-
 const DB_NAME = 'DataLensDB'
 const DB_VERSION = 1
 const STORE_NAME = 'datasets'
