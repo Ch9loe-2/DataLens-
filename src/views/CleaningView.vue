@@ -109,11 +109,79 @@
         </div>
       </div>
     </div>
+
+    <!-- Column editing -->
+    <div class="card">
+      <div class="card-header">列编辑</div>
+      <div class="form-row" style="margin-bottom:8px;">
+        <div class="form-group">
+          <label>选择列</label>
+          <select v-model="editColumn">
+            <option value="">-- 选择列 --</option>
+            <option v-for="col in report.columns" :key="col.name" :value="col.name">
+              {{ col.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div v-if="editColumn" class="form-row">
+        <div class="form-group">
+          <label>重命名为</label>
+          <input v-model="renameTarget" placeholder="新列名" />
+        </div>
+        <div class="form-group" style="align-self:flex-end;">
+          <button class="btn sm primary" @click="previewRenameColumn" :disabled="!renameTarget">重命名</button>
+        </div>
+        <div class="form-group" style="align-self:flex-end;">
+          <button class="btn sm danger" @click="previewDeleteColumn">删除列</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced filter -->
+    <div class="card">
+      <div class="card-header">高级筛选</div>
+      <p style="color:var(--text-secondary);margin-bottom:8px;">
+        按条件筛选数据行。
+      </p>
+      <div v-for="(cond, i) in filterConditions" :key="i" class="form-row" style="margin-bottom:6px;">
+        <div class="form-group" style="flex:2;">
+          <select v-model="cond.column">
+            <option value="">-- 列 --</option>
+            <option v-for="col in report.columns" :key="col.name" :value="col.name">{{ col.name }}</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:2;">
+          <select v-model="cond.operator">
+            <option value="equals">等于</option>
+            <option value="notEquals">不等于</option>
+            <option value="contains">包含</option>
+            <option value="notContains">不包含</option>
+            <option value="gt">&gt;</option>
+            <option value="lt">&lt;</option>
+            <option value="gte">&gt;=</option>
+            <option value="lte">&lt;=</option>
+            <option value="empty">为空</option>
+            <option value="notEmpty">不为空</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:3;">
+          <input v-model="cond.value" placeholder="值" :disabled="cond.operator === 'empty' || cond.operator === 'notEmpty'" />
+        </div>
+        <div class="form-group" style="align-self:flex-end;">
+          <button class="btn sm danger" @click="filterConditions.splice(i, 1)">✕</button>
+        </div>
+      </div>
+      <div class="btn-group" style="margin-top:8px;">
+        <button class="btn sm" @click="addFilterCondition">+ 添加条件</button>
+        <button class="btn primary sm" @click="previewApplyFilter" :disabled="filterConditions.length === 0">应用筛选</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { removeDuplicates, removeRowsWithMissing, fillMissingNumeric, fillMissingString, convertType } from '../cleaning/index.js'
+import { removeDuplicates, removeRowsWithMissing, fillMissingNumeric, fillMissingString, convertType, deleteColumn, renameColumn, applyFilter } from '../cleaning/index.js'
 
 export default {
   props: {
@@ -125,7 +193,11 @@ export default {
       preview: null,
       missingColumn: '',
       convertColumn: '',
-      convertTarget: ''
+      convertTarget: '',
+      editColumn: '',
+      renameTarget: '',
+      filterConditions: [],
+      filterLogic: 'all'
     }
   },
   computed: {
@@ -184,17 +256,17 @@ export default {
       // Save snapshot for undo
       this.dataset.saveSnapshot(this.preview.op)
 
-      if (this.preview.op === 'removeDuplicates') {
-        this.dataset.currentRows = this.preview.rows
-      } else if (this.preview.op === 'fillMissing') {
-        this.dataset.currentRows = this.preview.rows
-      } else if (this.preview.op === 'removeMissing') {
-        this.dataset.currentRows = this.preview.rows
-      } else if (this.preview.op === 'convertType') {
+      const op = this.preview.op
+      if (op === 'removeDuplicates' || op === 'fillMissing' || op === 'removeMissing' || op === 'convertType' ||
+          op === 'renameColumn' || op === 'deleteColumn' || op === 'applyFilter') {
         this.dataset.currentRows = this.preview.rows
       }
 
       this.preview = null
+      // Clear filter conditions after applying
+      if (op === 'applyFilter') {
+        this.filterConditions = []
+      }
       this.$emit('dataset-updated')
     },
 
@@ -202,6 +274,31 @@ export default {
       if (this.dataset.undo()) {
         this.$emit('dataset-updated')
       }
+    },
+
+    // Column editing
+    previewRenameColumn() {
+      if (!this.editColumn || !this.renameTarget) return
+      const result = renameColumn(this.dataset.getRows(), this.editColumn, this.renameTarget)
+      this.preview = { ...result, op: 'renameColumn', oldName: this.editColumn, newName: this.renameTarget, desc: `重命名 ${this.editColumn} → ${this.renameTarget}` }
+    },
+
+    previewDeleteColumn() {
+      if (!this.editColumn) return
+      const result = deleteColumn(this.dataset.getRows(), this.editColumn)
+      this.preview = { ...result, op: 'deleteColumn', column: this.editColumn }
+    },
+
+    // Advanced filter
+    addFilterCondition() {
+      this.filterConditions.push({ column: '', operator: 'equals', value: '' })
+    },
+
+    previewApplyFilter() {
+      const valid = this.filterConditions.filter(c => c.column && c.operator)
+      if (valid.length === 0) return
+      const result = applyFilter(this.dataset.getRows(), valid, true)
+      this.preview = { ...result, op: 'applyFilter', conditions: JSON.parse(JSON.stringify(valid)), desc: `筛选后保留 ${result.matched} 行` }
     }
   }
 }

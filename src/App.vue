@@ -54,6 +54,10 @@
           纯本地处理
         </div>
         <div>数据不上传服务器</div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:6px;cursor:pointer;" @click="toggleTheme">
+          <span>{{ isDark ? '☀️' : '🌙' }}</span>
+          <span>{{ isDark ? '浅色模式' : '暗色模式' }}</span>
+        </div>
       </div>
     </aside>
 
@@ -124,7 +128,16 @@ export default {
     return {
       currentView: 'import',
       dataset: null,
-      report: null
+      report: null,
+      isDark: false
+    }
+  },
+  created() {
+    // Restore theme preference
+    const saved = localStorage.getItem('datalens-theme')
+    if (saved === 'dark') {
+      this.isDark = true
+      document.documentElement.setAttribute('data-theme', 'dark')
     }
   },
   computed: {
@@ -168,6 +181,16 @@ export default {
           this.dataset.qualityReport = result
         }
       })
+    },
+    toggleTheme() {
+      this.isDark = !this.isDark
+      if (this.isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        localStorage.setItem('datalens-theme', 'dark')
+      } else {
+        document.documentElement.removeAttribute('data-theme')
+        localStorage.setItem('datalens-theme', 'light')
+      }
     }
   }
 }
