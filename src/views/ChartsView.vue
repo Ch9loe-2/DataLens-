@@ -69,7 +69,7 @@
 
 <script>
 import * as echarts from 'echarts'
-import { renderChart, disposeChart, buildLineChart, buildBarChart, buildPieChart, buildHistogram, getChartTypeRecommendation } from '../charts/index.js'
+import { buildLineChart, buildBarChart, buildPieChart, buildHistogram, getChartTypeRecommendation } from '../charts/index.js'
 
 export default {
   props: {

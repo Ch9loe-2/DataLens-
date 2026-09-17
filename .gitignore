@@ -4,3 +4,4 @@ dist/
 *.log
 .env
 *.timestamp-*.mjs
+RESUME.md

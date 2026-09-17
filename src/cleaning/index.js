@@ -32,21 +32,6 @@ export function removeRowsWithMissing(rows, columns) {
   return { rows: result, removed }
 }
 
-export function keepRowsWithMissing(rows, columns) {
-  // Keep only rows that have missing values in the specified columns
-  const result = []
-  let removed = 0
-  for (const row of rows) {
-    const hasMissing = columns.some(col => row[col] === null || row[col] === undefined || row[col] === '')
-    if (hasMissing) {
-      result.push(row)
-    } else {
-      removed++
-    }
-  }
-  return { rows: result, removed }
-}
-
 export function fillMissingNumeric(rows, column, strategy) {
   const values = rows.map(r => parseFloat(r[column])).filter(v => !isNaN(v))
   let fillValue

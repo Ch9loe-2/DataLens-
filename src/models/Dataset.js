@@ -22,9 +22,10 @@ export default class Dataset {
   }
 
   importData(parsedResult) {
-    this.rawRows = parsedResult.data
-    this.currentRows = [...this.rawRows]
-    this.originalRows = [...this.rawRows]
+    // Deep copy to avoid shared reference mutation between raw/current/original
+    this.rawRows = JSON.parse(JSON.stringify(parsedResult.data))
+    this.currentRows = JSON.parse(JSON.stringify(this.rawRows))
+    this.originalRows = JSON.parse(JSON.stringify(this.rawRows))
     this.meta.rowCount = this.rawRows.length
     this.meta.columnCount = this.rawRows.length > 0 ? Object.keys(this.rawRows[0]).length : 0
     this.meta.importedAt = new Date().toISOString()
@@ -65,16 +66,21 @@ export default class Dataset {
     this.historyIndex = this.history.length - 1
   }
 
+  /**
+   * Undo last operation.
+   * history[i] stores the state BEFORE the i-th operation was applied.
+   * Undoing restores history[historyIndex] (the state before the last operation).
+   */
   undo() {
-    if (this.historyIndex <= 0) return false
-    this.historyIndex--
+    if (this.historyIndex < 0) return false
     const snapshot = this.history[this.historyIndex]
     this.currentRows = JSON.parse(JSON.stringify(snapshot.rows))
+    this.historyIndex--
     return true
   }
 
   canUndo() {
-    return this.historyIndex > 0
+    return this.historyIndex >= 0
   }
 
   canRedo() {

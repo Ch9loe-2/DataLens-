@@ -62,7 +62,7 @@
           <label>选择列</label>
           <select v-model="missingColumn">
             <option value="">-- 选择列 --</option>
-            <option v-for="col in report.columns" :key="col.name" :value="col.name" v-if="col.nullCount > 0">
+            <option v-for="col in missingColumns" :key="col.name" :value="col.name">
               {{ col.name }} (缺失: {{ col.nullCount }})
             </option>
           </select>
@@ -132,6 +132,9 @@ export default {
     afterRows() {
       if (!this.preview) return this.report.totalRows
       return this.preview.rows ? this.preview.rows.length : this.report.totalRows
+    },
+    missingColumns() {
+      return this.report.columns.filter(c => c.nullCount > 0)
     }
   },
   methods: {

@@ -66,7 +66,7 @@ export default {
       if (file) await this.processFile(file)
     },
     async processFile(file) {
-      if (!file.name.endsWith('.csv') && !file.name.endsWith('.CSV')) {
+      if (!file.name.toLowerCase().endsWith('.csv')) {
         this.error = '仅支持 .csv 格式的文件'
         return
       }
