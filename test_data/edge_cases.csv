@@ -1,0 +1,11 @@
+﻿id,name,age,score,comment
+1,测试,25,95.5,"包含中文和标点符号！"
+2,alice,30,88.2,"emoji测试 😊 🎯 🔥"
+3,bob,,77,"空值年龄"
+4,charlie,29,,空值分数
+5,dave,35,91.0,"very long text that might overflow the cell in the table preview when rendered without proper truncation handling in the frontend table component"
+6,超长中文用户名测试数据看看会不会撑破布局,28,83.5,普通
+7,line\nbreak,22,70,换行符
+8,"comma,separated",26,89,逗号
+9,tab\tvalue,31,76,制表符
+10,special!@#$%^&*(),27,92,特殊符号
