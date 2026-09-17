@@ -23,7 +23,7 @@
           <span style="font-size:12px;color:var(--text-secondary);">清洗后</span>
         </div>
         <div class="stat">
-          <div class="num red">{{ preview.removed || preview.failed || 0 }}</div>
+          <div class="num red">{{ affectedCount }}</div>
           <span style="font-size:12px;color:var(--text-secondary);">受影响</span>
         </div>
       </div>
@@ -135,6 +135,10 @@ export default {
     },
     missingColumns() {
       return this.report.columns.filter(c => c.nullCount > 0)
+    },
+    affectedCount() {
+      if (!this.preview) return 0
+      return this.preview.removed || this.preview.filled || this.preview.converted || this.preview.failed || 0
     }
   },
   methods: {

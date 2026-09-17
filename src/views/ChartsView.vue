@@ -47,7 +47,7 @@
     </div>
 
     <!-- Single column distribution -->
-    <div class="card" v-if="report.columns.length > 0">
+    <div class="card" v-if="numericColumns.length > 0">
       <div class="card-header">单列数值分布</div>
       <div class="form-group">
         <label>选择数值列</label>
