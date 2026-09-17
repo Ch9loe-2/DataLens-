@@ -5,3 +5,4 @@ dist/
 .env
 *.timestamp-*.mjs
 RESUME.md
+INTERVIEW_ASSETS.md

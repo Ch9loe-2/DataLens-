@@ -199,6 +199,19 @@ Main Thread               Web Worker
 
 测试脚本：`test_data/run_tests.js`（Node.js 环境运行，62 项断言）
 
+### 代码审查
+
+DataLens 经过完整两轮代码审查，共发现并修复 **17 项**问题：
+
+| 级别 | 数量 | 类型 |
+|------|------|------|
+| 🔴 P0（真实 Bug） | 2 | applyFilter 0 值 falsy 逻辑错误、undo 后 preview 未清空 |
+| 🟠 P1（死代码/设计） | 2 | charts/index.js 未使用的 renderChart/disposeChart、AI 生成痕迹 JSDoc |
+| 🟡 P2（UI/UX/性能） | 6 | ChartsView race condition、QualityView 列遍历错误、分块大小警告等 |
+| 🟢 P3（小优化） | 7 | Column.js 无用判断、auto 模式可见性、histogram race 保护等 |
+
+修复详情见 Git commit `095052a`。
+
 ## 使用方法
 
 ```bash
