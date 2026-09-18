@@ -4,5 +4,6 @@ dist/
 *.log
 .env
 *.timestamp-*.mjs
+*.timestamp-*
 RESUME.md
 INTERVIEW_ASSETS.md
